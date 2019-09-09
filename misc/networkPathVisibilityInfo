@@ -1,0 +1,70 @@
+We will port one until we get an icmp "port
+ * unreachable" (which means we got to "host") or hit a max (which
+ * defaults to 64 hops & can be changed with the -m flag).
+
+
+ -m number of hops to be sent 
+ -q number of probes
+ -w timeout 
+ -p to change port 
+
+ roundtrip time of each probe 
+
+ Probe packets are UDP format 
+ Dont want destination host to process them ,hence it is sent to an unlikely value 
+
+
+
+
+
+If two hops addresses are same ,then this is due to buggy kernel that forwards packets with zero ttl 
+
+
+ *     traceroute to allspice.lcs.mit.edu (18.26.0.115), 64 hops max
+ *      1  helios.ee.lbl.gov (128.3.112.1)  0 ms  0 ms  0 ms
+ *      2  lilac-dmc.Berkeley.EDU (128.32.216.1)  19 ms  19 ms  19 ms
+ *      3  lilac-dmc.Berkeley.EDU (128.32.216.1)  39 ms  19 ms  19 ms
+ *      4  ccngw-ner-cc.Berkeley.EDU (128.32.136.23)  19 ms  39 ms  39 ms
+ *      5  ccn-nerif22.Berkeley.EDU (128.32.168.22)  20 ms  39 ms  39 ms
+ *      6  128.32.197.4 (128.32.197.4)  59 ms  119 ms  39 ms
+ *      7  131.119.2.5 (131.119.2.5)  59 ms  59 ms  39 ms
+ *      8  129.140.70.13 (129.140.70.13)  80 ms  79 ms  99 ms
+ *      9  129.140.71.6 (129.140.71.6)  139 ms  139 ms  159 ms
+ *     10  129.140.81.7 (129.140.81.7)  199 ms  180 ms  300 ms
+ *     11  129.140.72.17 (129.140.72.17)  300 ms  239 ms  239 ms
+ *     12  * * *
+ *     13  128.121.54.72 (128.121.54.72)  259 ms  499 ms  279 ms
+ *     14  * * *
+ *     15  * * *
+ *     16  * * *
+ *     17  * * *
+ *     18  ALLSPICE.LCS.MIT.EDU (18.26.0.115)  339 ms  279 ms  279 ms
+ *
+ * (I start to see why I'm having so much trouble with mail to
+ * MIT.)  Note that the gateways 12, 14, 15, 16 & 17 hops away
+ * either don't send ICMP "time exceeded" messages or send them
+ * with a ttl too small to reach us.  14 - 17 are running the
+ * MIT C Gateway code that doesn't send "time exceeded"s.  God
+ * only knows what's going on with 12.
+ *
+ * The silent gateway 12 in the above may be the result of a bug in
+ * the 4.[23]BSD network code (and its derivatives):  4.x (x <= 3)
+ * sends an unreachable message using whatever ttl remains in the
+ * original datagram.  Since, for gateways, the remaining ttl is
+ * zero, the icmp "time exceeded" is guaranteed to not make it back
+ * to us.  The behavior of this bug is slightly more interesting
+ * when it appears on the destination system:
+
+
+! -due to obsolete DEC's Ultrix,Sun 3.x
+!H ,!N, !P - got a Host,netwrokr or protocol unreachable
+!source route failed
+!F-fragementation needed
+
+must be run by root
+
+\\ raw ip socket using proto
+ * IPPROTO_RAW must interpret the data sent as an ip datagram (as
+ * opposed to data to be wrapped in a ip datagram)
+
+--pid as port 

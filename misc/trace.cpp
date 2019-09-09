@@ -34,7 +34,7 @@
 
 #define MAXHOPS 30
 
-;
+using namespace std;
 
 unsigned short csum(unsigned short *buf, int nwords)
 {
@@ -84,7 +84,7 @@ int main(int argc,char **argv)
 
     try
     {
-        int socketFileDescriptor = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
+        int socketFileDescriptor = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
         if(socketFileDescriptor==0){
             cout<<"Unable to create Socket error Socket Error"<<endl;
             return 1;
@@ -186,7 +186,7 @@ int main(int argc,char **argv)
                 struct ip * ip_hdr2=(struct ip*)(receiveBuff);
 
                 struct icmphdr *icmphd2 = (struct icmphdr *)(receiveBuff + 20);
-                if(ip_hdr2->ip_pr)
+                //if(ip_hdr2->ip_pr)
                 
                 struct sockaddr_in sockAddr;
                 memset(&sockAddr,0,sizeof(sockAddr));

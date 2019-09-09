@@ -1,3 +1,4 @@
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -55,7 +56,7 @@ int main (int argc, char *argv[])
     printf ("Cannot set HDRINCL!\n"); 
 
   struct sockaddr_in addr;
-  addr.sin_port = htons (7);
+  addr.sin_port = htons (34432);
   addr.sin_family = AF_INET;
   inet_pton (AF_INET, argv[2], &(addr.sin_addr));// convert IPV4 addres from text to Binary
 
