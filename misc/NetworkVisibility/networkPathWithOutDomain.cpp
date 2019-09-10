@@ -36,7 +36,7 @@ size_t split(const std::string &txt, std::vector<std::string> &strs, char ch)
 
 int main(int argc, char *argv[])
 {
-    string command = "traceroute " + string(argv[1]) + " -q 1 -w 1-m 30 --icmp";
+    string command = "traceroute " + string(argv[1]) + " -n -q 1 -w 1-m 30 --icmp";
     FILE *process = popen(command.c_str(), "r");
     char buff[1024];
     int hopCounter = 0;
@@ -80,28 +80,28 @@ int main(int argc, char *argv[])
 
         if (hopCounter1 < 10)
         {
-            networkInfo.domainName = splitString[3];
-            networkInfo.hostIp = splitString[4];
-            networkInfo.hostIp = networkInfo.hostIp.substr(1, networkInfo.hostIp.size() - 2);
-            networkInfo.latency = atof(splitString[6].c_str());
+            
+            networkInfo.hostIp = splitString[3];
+            //networkInfo.hostIp = networkInfo.hostIp.substr(1, networkInfo.hostIp.size() - 2);
+            networkInfo.latency = atof(splitString[5].c_str());
         }
         else
         {
-            networkInfo.domainName = splitString[2];
-            networkInfo.hostIp = splitString[3];
-            networkInfo.hostIp = networkInfo.hostIp.substr(1, networkInfo.hostIp.size() - 2);
-            networkInfo.latency = atof(splitString[5].c_str());
+            
+            networkInfo.hostIp = splitString[2];
+            //networkInfo.hostIp = networkInfo.hostIp.substr(1, networkInfo.hostIp.size() - 2);
+            networkInfo.latency = atof(splitString[4].c_str());
         }
 
         traceInfo.push_back(networkInfo);
     }
 
     cout << "===============Packets are travelling through============" << endl;
-    cout<< "hop\tDomainName\tIP Address\tLatency(ms)\n";
+    cout<< "hop\tIP Address\tLatency(ms)\n";
 
     for (auto iter2 = traceInfo.begin(); iter2 < (traceInfo.end()-1); ++iter2)
     {
-        cout << (*iter2).hop << "\t" << (*iter2).domainName << "\t" << (*iter2).hostIp << "\t" << (*iter2).latency << "ms" << endl;
+        cout << (*iter2).hop <<  "\t" << (*iter2).hostIp << "\t" << (*iter2).latency << "ms" << endl;
     }
 
     return 0;

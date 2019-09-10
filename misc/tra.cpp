@@ -32,21 +32,21 @@ using namespace std;
 // Variables for tracerouting
 int main()
 {
-    int sockRaw;
-    struct sockaddr_in dest, from;
+    int sockRaw;    //raw sockets
+    struct sockaddr_in dest, from; //socket address destination and from 
     int ret, datasize, done = 0, maxhops = 30, ttl = 1;
-    socklen_t fromlen = sizeof(from);
-    char icmpData[1024];
-    char recvBuffer[1024];
-    char destIP[16] = "172.26.96.150";
+    socklen_t fromlen = sizeof(from); //socke length 
+    char icmpData[1024];  //icmp Data
+    char recvBuffer[1024]; //recv buffer 
+    char destIP[16] = "172.26.96.150";   //Destination IP
     unsigned short seq_no = 0;
 
-    struct timeval timeout;
+    struct timeval timeout;   //time out 
 
-    int hopTimeoutCount = 0;
+    int hopTimeoutCount = 0;  //hop count 
 
     // Create a raw socket
-    sockRaw = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    sockRaw = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);   //RAW Socket witj ICMP protocols
     if (sockRaw == SOCKET_ERROR)
     {
         printf("Failed to create tracert socket, errno: %d\n", errno);
@@ -54,55 +54,55 @@ int main()
         return 1;
     }
     // Set timeout values
-    timeout.tv_sec = 5;
+    timeout.tv_sec = 5;  //5 secs time out 
     timeout.tv_usec = 0;
-    ret = setsockopt(sockRaw, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));
+    ret = setsockopt(sockRaw, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));  // putting send timeout : 5 secs
     if (ret == SOCKET_ERROR)
     {
         printf("Failed to set receive timeout, errno: %d\n", errno);
         pthread_exit((void *)1);
         return 1;
     }
-    ret = setsockopt(sockRaw, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval));
+    ret = setsockopt(sockRaw, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval));  //putting receive timeout 5 secs
     if (sockRaw == SOCKET_ERROR)
     {
         printf("Failed to set send timeout, errno: %d\n", errno);
         pthread_exit((void *)1);
         return 1;
     }
-    memset(&dest, 0, sizeof(struct sockaddr_in));
+    memset(&dest, 0, sizeof(struct sockaddr_in));   //copy 0 to destination address 
     dest.sin_family = AF_INET;
     // Set the destination address
-    if ((dest.sin_addr.s_addr = inet_addr(destIP)) == INADDR_NONE)
+    if ((dest.sin_addr.s_addr = inet_addr(destIP)) == INADDR_NONE)//dest.sin_addr.s_addr ---convert destIP from 
     {
         printf("Failed to set destination ip, errno: %d\n", errno);
         pthread_exit((void *)1);
         return 1;
     }
-    memset(icmpData, 0, sizeof(icmpData));
+    memset(icmpData, 0, sizeof(icmpData)); //set icmp data 0
     datasize = sizeof(icmpData);
-    datasize += sizeof(IcmpHeader);
+    datasize += sizeof(IcmpHeader);  //ICMP header + size of data
     // Fill in ICMP header data
-    IcmpHeader *icmp_hdr;
-    char *datapart;
-    icmp_hdr = (IcmpHeader *)icmpData;
-    icmp_hdr->i_type = ICMP_ECHO;
-    icmp_hdr->i_code = 0;
+    IcmpHeader *icmp_hdr;  //ICMP header pointer 
+    char *datapart; 
+    icmp_hdr = (IcmpHeader *)icmpData;  //ICMP header 
+    icmp_hdr->i_type = ICMP_ECHO;  //ICMP_ECHO
+    icmp_hdr->i_code = 0;  
     icmp_hdr->i_id = (unsigned short)getpid();
     icmp_hdr->i_cksum = 0;
     icmp_hdr->i_seq = 0;
     datapart = icmpData + sizeof(IcmpHeader);
-    memset(datapart, 'E', datasize - sizeof(IcmpHeader));
+    memset(datapart, 'E', datasize - sizeof(IcmpHeader)); //form ICMP header and add to it 
 
     for (ttl = 1; ((ttl < maxhops) && (!done)); ttl++)
     {
         // Set the time to live
-        ret = setsockopt(sockRaw, IPPROTO_IP, IP_TTL, (int *)&ttl, sizeof(int));
+        ret = setsockopt(sockRaw, IPPROTO_IP, IP_TTL, (int *)&ttl, sizeof(int));// set c
         if (ret == SOCKET_ERROR)
         {
             printf("Failed to set TTL, errno: %d\n", errno);
             pthread_exit((void *)1);
-            return ((void *)1);
+            return 1;
         }
         ((IcmpHeader *)icmpData)->i_seq = seq_no++;
         ((IcmpHeader *)icmpData)->i_cksum = checksum((unsigned short *)icmpData, datasize);
@@ -112,7 +112,7 @@ int main()
         {
             printf("Failed to send ICMP, errno: %d\n", errno);
             pthread_exit((void *)1);
-            return ((void *)1);
+            return 1;
         }
         // Read the packet
         ret = recvfrom(sockRaw, recvBuffer, sizeof(recvBuffer), 0, (struct sockaddr *)&from, &fromlen);
@@ -126,7 +126,7 @@ int main()
                 // Too many timeouts, the destination is probably not responding to ICMP packets
                 printf("Traceroute finished (no response)\n");
                 pthread_exit((void *)1);
-                return ((void *)1);
+                return 1;
             }
             continue;
         }
